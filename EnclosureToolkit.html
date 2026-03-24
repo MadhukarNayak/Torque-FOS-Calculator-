@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Enclosure Engineering Toolkit v2</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{--bg:#fff;--surface:#f4f6f9;--surface2:#eef0f5;--border:#dde1ea;--border2:#c8cdd9;--accent:#0077cc;--warn:#c47a00;--danger:#c0392b;--text:#1a1d26;--text2:#4a5270;--text3:#8892a8;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--r:6px;--rl:10px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;}
+  header{border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;}
+  .logo{display:flex;align-items:center;gap:10px;}
+  .lmark{width:24px;height:24px;border:2px solid var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;}
+  .lmark svg{width:13px;height:13px;}
+  .ltxt{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;}
+  .lsub{font-size:10px;color:var(--text3);font-family:var(--mono);}
+  .ver{font-family:var(--mono);font-size:10px;color:var(--text3);border:1px solid var(--border);padding:2px 7px;border-radius:3px;}
+  .dot{width:6px;height:6px;background:#1D9E75;border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .nav{display:flex;padding:0 24px;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;}
+  .ni{padding:10px 13px;font-size:11px;font-family:var(--mono);color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+  .ni:hover{color:var(--text);}
+  .ni.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .main{display:flex;height:calc(100vh - 109px);overflow:hidden;}
+  .sb{width:248px;min-width:248px;border-right:1px solid var(--border);overflow-y:auto;padding:14px 0;}
+  .sbs{padding:0 13px;margin-bottom:18px;}
+  .sbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px;}
+  .f{margin-bottom:9px;}
+  .f label{display:block;font-size:11px;color:var(--text2);margin-bottom:4px;font-family:var(--mono);}
+  select,input[type=number]{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:var(--r);font-family:var(--mono);font-size:11px;outline:none;transition:border .2s;appearance:none;-webkit-appearance:none;}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238892a8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px;}
+  select:focus,input:focus{border-color:var(--accent);}
+  .content{flex:1;overflow-y:auto;padding:18px 22px;}
+  .panel{display:none;}.panel.active{display:block;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:13px;position:relative;overflow:hidden;}
+  .mc.feat{border-color:var(--accent);}
+  .mc.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);}
+  .ml{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px;}
+  .mv{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--text);line-height:1;}
+  .mc.feat .mv{color:var(--accent);}
+  .mu{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:3px;}
+  .fsec{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:13px;margin-bottom:14px;}
+  .fhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .fttl{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;}
+  .fval{font-family:var(--mono);font-size:12px;font-weight:600;}
+  .ftrk{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:8px;}
+  .ffil{height:100%;border-radius:4px;transition:width .5s,background .4s;}
+  .sb2{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r);font-family:var(--mono);font-size:11px;font-weight:500;}
+  .sb2::before{content:'';width:5px;height:5px;border-radius:50%;}
+  .bs{background:#e6f4ee;color:#0a6640;border:1px solid #a3d4bc;}.bs::before{background:#0a6640;}
+  .bw{background:#fef6e6;color:#c47a00;border:1px solid #f5cc7a;}.bw::before{background:#c47a00;}
+  .bd{background:#fdecea;color:#c0392b;border:1px solid #f5a9a3;}.bd::before{background:#c0392b;}
+  .al{border-radius:var(--r);padding:8px 12px;font-size:11px;margin-top:8px;border-left:3px solid;font-family:var(--mono);line-height:1.5;}
+  .as{background:#e6f4ee;color:#0a6640;border-color:#0a6640;}
+  .aw{background:#fef6e6;color:#c47a00;border-color:#c47a00;}
+  .ad{background:#fdecea;color:#c0392b;border-color:#c0392b;}
+  .sh{display:flex;align-items:center;gap:8px;margin-bottom:11px;}
+  .sh h3{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.09em;font-weight:500;white-space:nowrap;}
+  .sl{flex:1;height:1px;background:var(--border);}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;}
+  thead th{background:var(--surface);color:var(--text3);font-weight:500;padding:7px 9px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);}
+  tbody td{padding:7px 9px;border-bottom:1px solid var(--border);color:var(--text2);}
+  tbody tr:hover td{background:var(--surface);color:var(--text);}
+  tbody tr.sel td{background:rgba(0,119,204,.06);color:var(--accent);}
+  tbody tr.sel td:first-child{border-left:2px solid var(--accent);}
+  tbody tr:last-child td{border-bottom:none;}
+  .tw{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:14px;}
+  .ig{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .ic{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:13px;}
+  .ic h4{font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px;font-weight:600;}
+  .ir{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;}
+  .ir:last-child{border-bottom:none;}
+  .ik{color:var(--text2);font-family:var(--mono);}
+  .iv{color:var(--text);font-family:var(--mono);font-weight:500;}
+  footer{border-top:1px solid var(--border);padding:7px 24px;display:flex;justify-content:space-between;align-items:center;}
+  .ft{font-family:var(--mono);font-size:10px;color:var(--text3);}
+  .ftag{font-family:var(--mono);font-size:10px;color:var(--text3);border:1px solid var(--border);padding:2px 7px;border-radius:3px;}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+  .itg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+  .itc{border:1.5px solid var(--border);border-radius:var(--rl);padding:11px 8px;cursor:pointer;transition:all .2s;text-align:center;}
+  .itc:hover{border-color:var(--accent);}
+  .itc.active{border-color:var(--accent);background:#eef6fd;}
+  .itn{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px;}
+  .its{font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.3;}
+  .itic{font-size:18px;margin-bottom:5px;}
+  .wbanner{background:#fef6e6;border:1px solid #f5cc7a;border-radius:var(--r);padding:9px 12px;font-size:11px;font-family:var(--mono);color:#7a4f00;margin-bottom:12px;line-height:1.6;}
+  .obanner{background:#e6f4ee;border:1px solid #a3d4bc;border-radius:var(--r);padding:9px 12px;font-size:11px;font-family:var(--mono);color:#0a5230;margin-bottom:12px;line-height:1.6;}
+  .dbox{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--rl);padding:13px;margin-bottom:14px;font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.9;}
+  .dbox strong{color:var(--accent);font-weight:600;}
+  .cgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:14px;}
+  .cc{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;}
+  .ccs{font-family:var(--mono);font-size:12px;font-weight:600;margin-bottom:2px;}
+  .cct{font-family:var(--mono);font-size:10px;color:var(--text2);}
+  .divline{border:none;border-top:1px solid var(--border);margin:14px 0;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="lmark">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="#0077cc" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="#0077cc" stroke-width="1.5" stroke-linecap="round"/><path d="M3.5 3.5l1.4 1.4M11.1 11.1l1.4 1.4M11.1 4.9l1.4-1.4M3.5 12.5l1.4-1.4" stroke="#0077cc" stroke-width="1" stroke-linecap="round"/></svg>
+    </div>
+    <div><div class="ltxt">ENCLOSURE TOOLKIT</div><div class="lsub">Engineering Calculator Suite</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;"><div class="ver">v2.0.0</div><div class="dot"></div></div>
+</header>
+
+<div class="nav">
+  <div class="ni active" onclick="switchTab('torque',this)">01 / Torque</div>
+  <div class="ni" onclick="switchTab('insert',this)">02 / PEM &amp; Inserts</div>
+  <div class="ni" onclick="switchTab('fos',this)">03 / FOS Reference</div>
+  <div class="ni" onclick="switchTab('material',this)">04 / Material Data</div>
+</div>
+
+<div class="main">
+  <div class="sb">
+    <div class="sbs">
+      <div class="sbl">Fastener</div>
+      <div class="f"><label>Size</label>
+        <select id="size" onchange="calc()">
+          <option>M2</option><option>M2.5</option><option value="M3" selected>M3</option>
+          <option>M4</option><option>M5</option><option>M6</option>
+          <option>M8</option><option>M10</option><option>M12</option><option>M16</option>
+        </select></div>
+      <div class="f"><label>Grade</label>
+        <select id="grade" onchange="calc()">
+          <option value="4.8">Grade 4.8 — mild steel</option>
+          <option value="8.8" selected>Grade 8.8 — high tensile</option>
+          <option value="10.9">Grade 10.9 — very high tensile</option>
+          <option value="12.9">Grade 12.9 — ultra high tensile</option>
+          <option value="A2">A2-70 — stainless</option>
+          <option value="A4">A4-80 — marine SS</option>
+        </select></div>
+      <div class="f"><label>Thread type</label>
+        <select id="thread" onchange="calc()">
+          <option value="coarse" selected>Coarse (standard)</option>
+          <option value="fine">Fine thread</option>
+        </select></div>
+    </div>
+    <div class="sbs">
+      <div class="sbl">Enclosure (standard)</div>
+      <div class="f"><label>Parent material</label>
+        <select id="material" onchange="calc()">
+          <optgroup label="Plastics">
+            <option value="ABS">ABS plastic</option><option value="PC">Polycarbonate</option>
+            <option value="PCABS">PC+ABS blend</option><option value="PA66">Nylon PA66</option>
+            <option value="POM">POM / Delrin</option><option value="GRP">GRP / Fibreglass</option>
+          </optgroup>
+          <optgroup label="Metals">
+            <option value="AL">Aluminium alloy</option><option value="SS">Stainless steel</option>
+            <option value="MS" selected>Mild steel</option><option value="CAST">Cast iron</option>
+            <option value="CU">Copper / Brass</option>
+          </optgroup>
+        </select></div>
+      <div class="f"><label>Lubrication</label>
+        <select id="lube" onchange="calc()">
+          <option value="dry" selected>Dry — no lubrication</option>
+          <option value="light">Lightly oiled</option>
+          <option value="greased">Greased / zinc plated</option>
+        </select></div>
+      <div class="f"><label>Threads engaged</label>
+        <input type="number" id="threads" value="6" min="1" max="30" onchange="calc()"/></div>
+    </div>
+    <div class="sbs">
+      <div class="sbl">Safety target</div>
+      <div class="f"><label>Target FOS</label>
+        <select id="fos_target" onchange="calc()">
+          <option value="1.5">1.5 — consumer electronics</option>
+          <option value="2.0">2.0 — industrial standard</option>
+          <option value="2.5" selected>2.5 — industrial robust</option>
+          <option value="3.0">3.0 — IP69K / harsh env</option>
+          <option value="4.0">4.0 — flameproof / ATEX</option>
+        </select></div>
+    </div>
+    <hr class="divline"/>
+    <div class="sbs">
+      <div class="sbl">PEM / Insert inputs</div>
+      <div class="f"><label>Insert type</label>
+        <select id="insert_type" onchange="syncInsertCard();calcInsert()">
+          <option value="PEM_S">PEM S-series (self-clinching)</option>
+          <option value="PEM_B">PEM B-series (broaching)</option>
+          <option value="PEM_SP">PEM SP (thin sheet)</option>
+          <option value="RIVET_AL">Rivet nut — aluminium</option>
+          <option value="RIVET_SS">Rivet nut — stainless</option>
+          <option value="HELICOIL">Helicoil / thread insert</option>
+          <option value="KEENSERT">Keensert / locking insert</option>
+        </select></div>
+      <div class="f"><label>Sheet / wall thickness (mm)</label>
+        <input type="number" id="sheet_t" value="2" min="0.5" max="20" step="0.5" onchange="calcInsert()"/></div>
+      <div class="f"><label>Insert body material</label>
+        <select id="insert_mat" onchange="calcInsert()">
+          <option value="AL" selected>Aluminium</option>
+          <option value="SS">Stainless steel</option>
+          <option value="MS">Mild steel</option>
+          <option value="CU">Brass / Copper</option>
+        </select></div>
+      <div class="f"><label>Housing / parent material</label>
+        <select id="housing_mat" onchange="calcInsert()">
+          <optgroup label="Plastics">
+            <option value="ABS" selected>ABS plastic</option>
+            <option value="PC">Polycarbonate</option>
+            <option value="PCABS">PC+ABS blend</option>
+            <option value="PA66">Nylon PA66</option>
+            <option value="POM">POM / Delrin</option>
+          </optgroup>
+          <optgroup label="Metals">
+            <option value="AL_h">Aluminium sheet</option>
+            <option value="MS_h">Mild steel sheet</option>
+            <option value="SS_h">Stainless sheet</option>
+          </optgroup>
+        </select></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- TAB 01 TORQUE -->
+    <div id="panel-torque" class="panel active">
+      <div class="sh"><h3>Torque results</h3><div class="sl"></div><span id="size-label" style="font-family:var(--mono);font-size:10px;color:var(--accent)"></span></div>
+      <div class="g3">
+        <div class="mc"><div class="ml">Minimum torque</div><div class="mv" id="r-min">—</div><div class="mu">N·m</div></div>
+        <div class="mc feat"><div class="ml">Recommended torque</div><div class="mv" id="r-rec">—</div><div class="mu">N·m</div></div>
+        <div class="mc"><div class="ml">Maximum torque</div><div class="mv" id="r-max">—</div><div class="mu">N·m</div></div>
+      </div>
+      <div class="g2">
+        <div class="mc"><div class="ml">Clamping force</div><div class="mv" id="r-clamp">—</div><div class="mu">kN</div></div>
+        <div class="mc"><div class="ml">Proof load</div><div class="mv" id="r-proof">—</div><div class="mu">kN</div></div>
+      </div>
+      <div class="fsec">
+        <div class="fhdr"><span class="fttl">Factor of safety — thread strip</span><span class="fval" id="r-fos">—</span></div>
+        <div class="ftrk"><div class="ffil" id="fos-bar" style="width:0%"></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span id="fos-badge"></span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)" id="fos-tlbl"></span>
+        </div>
+        <div id="alert-box"></div>
+      </div>
+      <div class="sh"><h3>All sizes reference table</h3><div class="sl"></div></div>
+      <div class="tw">
+        <table><thead><tr><th>Size</th><th>Min (N·m)</th><th>Rec (N·m)</th><th>Max (N·m)</th><th>Clamp (kN)</th><th>FOS</th><th>Status</th></tr></thead>
+        <tbody id="ref-body"></tbody></table>
+      </div>
+    </div>
+
+    <!-- TAB 02 INSERT -->
+    <div id="panel-insert" class="panel">
+      <div class="sh"><h3>Select insert type</h3><div class="sl"></div></div>
+      <div class="itg">
+        <div class="itc active" id="icard-PEM_S" onclick="selectInsert('PEM_S')"><div class="itic">⬡</div><div class="itn">PEM S</div><div class="its">Self-clinching<br>Metal sheet</div></div>
+        <div class="itc" id="icard-PEM_B" onclick="selectInsert('PEM_B')"><div class="itic">⬣</div><div class="itn">PEM B</div><div class="its">Broaching<br>Plastic</div></div>
+        <div class="itc" id="icard-PEM_SP" onclick="selectInsert('PEM_SP')"><div class="itic">◈</div><div class="itn">PEM SP</div><div class="its">Thin sheet<br>&lt;1.5mm</div></div>
+        <div class="itc" id="icard-RIVET_AL" onclick="selectInsert('RIVET_AL')"><div class="itic">⊙</div><div class="itn">Rivet — Al</div><div class="its">Aluminium<br>Blind install</div></div>
+        <div class="itc" id="icard-RIVET_SS" onclick="selectInsert('RIVET_SS')"><div class="itic">⊚</div><div class="itn">Rivet — SS</div><div class="its">Stainless<br>Marine/harsh</div></div>
+        <div class="itc" id="icard-HELICOIL" onclick="selectInsert('HELICOIL')"><div class="itic">⌀</div><div class="itn">Helicoil</div><div class="its">Thread insert<br>Al boss repair</div></div>
+        <div class="itc" id="icard-KEENSERT" onclick="selectInsert('KEENSERT')"><div class="itic">⊛</div><div class="itn">Keensert</div><div class="its">Locking<br>High vibration</div></div>
+      </div>
+
+      <div id="insert-banner"></div>
+
+      <div class="sh"><h3>Calculated torque &amp; force</h3><div class="sl"></div></div>
+      <div class="g3" id="ins-metrics1"></div>
+      <div class="g2" id="ins-metrics2"></div>
+
+      <div class="fsec">
+        <div class="fhdr"><span class="fttl">Pull-out &amp; strip FOS</span><span class="fval" id="ins-fos-val">—</span></div>
+        <div class="ftrk"><div class="ffil" id="ins-fos-bar" style="width:0%"></div></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="ins-badges"></div>
+        <div id="ins-alert"></div>
+      </div>
+
+      <div class="sh"><h3>Drawing callout</h3><div class="sl"></div></div>
+      <div class="dbox" id="dcallout">Configure inputs on the left to generate drawing callout.</div>
+
+      <div class="sh"><h3>All sizes — suitability check</h3><div class="sl"></div></div>
+      <div class="tw">
+        <table><thead><tr><th>Size</th><th>Rec torque (N·m)</th><th>Pull-out (kN)</th><th>Strip FOS</th><th>Pull-out FOS</th><th>Min sheet (mm)</th><th>Status</th></tr></thead>
+        <tbody id="ins-tbody"></tbody></table>
+      </div>
+
+      <div class="sh" style="margin-top:4px"><h3>Insert selection guide</h3><div class="sl"></div></div>
+      <div class="tw">
+        <table><thead><tr><th>Insert type</th><th>Best application</th><th>Blind install</th><th>Anti-spin</th><th>Vibration</th><th>Plastic OK</th></tr></thead>
+        <tbody>
+          <tr><td>PEM S-series</td><td>Steel / Al sheet ≥0.5mm</td><td>No</td><td>Excellent</td><td>Good</td><td>No</td></tr>
+          <tr><td>PEM B-series</td><td>Plastic / PCB ≥1.5mm</td><td>No</td><td>Excellent</td><td>Good</td><td>Yes</td></tr>
+          <tr><td>PEM SP-series</td><td>Thin sheet &lt;1.5mm</td><td>No</td><td>Good</td><td>Moderate</td><td>No</td></tr>
+          <tr><td>Rivet nut Al</td><td>Any — blind access only</td><td>Yes</td><td>Moderate</td><td>Moderate</td><td>Yes (knurled)</td></tr>
+          <tr><td>Rivet nut SS</td><td>Marine / offshore / food</td><td>Yes</td><td>Moderate</td><td>Moderate</td><td>Yes (knurled)</td></tr>
+          <tr><td>Helicoil</td><td>Al boss / thread repair</td><td>No</td><td>N/A</td><td>Excellent</td><td>No</td></tr>
+          <tr><td>Keensert</td><td>ATEX / defence / vibration</td><td>No</td><td>Excellent</td><td>Excellent</td><td>No</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- TAB 03 FOS -->
+    <div id="panel-fos" class="panel">
+      <div class="sh"><h3>FOS quick reference — all sizes</h3><div class="sl"></div></div>
+      <div class="cgrid" id="fos-grid"></div>
+      <div class="sh" style="margin-top:4px"><h3>FOS by product type</h3><div class="sl"></div></div>
+      <div class="tw"><table><thead><tr><th>Product type</th><th>Min FOS</th><th>Target FOS</th><th>Reason</th></tr></thead><tbody>
+        <tr><td>Consumer electronics</td><td>1.5</td><td>2.0</td><td>Low risk, light duty</td></tr>
+        <tr><td>Industrial control panel</td><td>2.0</td><td>2.5</td><td>Vibration, thermal cycling</td></tr>
+        <tr><td>IP69K wash-down</td><td>2.5</td><td>3.0</td><td>High pressure water ingress</td></tr>
+        <tr><td>Flameproof / ATEX</td><td>3.5</td><td>4.0</td><td>Safety critical — hazardous area</td></tr>
+        <tr><td>Offshore / marine</td><td>3.0</td><td>3.5</td><td>Corrosion, vibration, shock</td></tr>
+        <tr><td>Automotive / EV battery</td><td>2.5</td><td>3.0</td><td>Crash load, vibration</td></tr>
+        <tr><td>Medical device</td><td>2.0</td><td>2.5</td><td>Regulatory compliance</td></tr>
+        <tr><td>Defence / mil-spec</td><td>3.0</td><td>4.0+</td><td>Extreme environment, shock</td></tr>
+      </tbody></table></div>
+      <div class="sh" style="margin-top:4px"><h3>FOS improvement methods</h3><div class="sl"></div></div>
+      <div class="tw"><table><thead><tr><th>Method</th><th>FOS gain</th><th>Cost</th><th>Weight</th></tr></thead><tbody>
+        <tr><td>Add fillets at corners</td><td>High</td><td>Zero</td><td>Zero</td></tr>
+        <tr><td>Add ribs to flat walls</td><td>High</td><td>Low</td><td>Low</td></tr>
+        <tr><td>Increase wall thickness</td><td>Medium</td><td>Low</td><td>Increases</td></tr>
+        <tr><td>Metal thread insert</td><td>Very high</td><td>Low</td><td>Zero</td></tr>
+        <tr><td>Gussets on bosses</td><td>High</td><td>Low</td><td>Low</td></tr>
+        <tr><td>Better material grade</td><td>High</td><td>High</td><td>Varies</td></tr>
+        <tr><td>More mounting points</td><td>High</td><td>Low</td><td>Zero</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <!-- TAB 04 MATERIAL -->
+    <div id="panel-material" class="panel">
+      <div class="sh"><h3>Material properties</h3><div class="sl"></div></div>
+      <div class="ig">
+        <div class="ic"><h4>Plastic materials</h4>
+          <div class="ir"><span class="ik">ABS</span><span class="iv">40–50 MPa</span></div>
+          <div class="ir"><span class="ik">Polycarbonate</span><span class="iv">55–65 MPa</span></div>
+          <div class="ir"><span class="ik">PC+ABS</span><span class="iv">45–55 MPa</span></div>
+          <div class="ir"><span class="ik">Nylon PA66</span><span class="iv">75–85 MPa</span></div>
+          <div class="ir"><span class="ik">POM/Delrin</span><span class="iv">60–70 MPa</span></div>
+          <div class="ir"><span class="ik">GRP/Fibreglass</span><span class="iv">95–105 MPa</span></div>
+        </div>
+        <div class="ic"><h4>Metal materials</h4>
+          <div class="ir"><span class="ik">Aluminium alloy</span><span class="iv">260–280 MPa</span></div>
+          <div class="ir"><span class="ik">Mild steel</span><span class="iv">245–255 MPa</span></div>
+          <div class="ir"><span class="ik">Stainless steel</span><span class="iv">205–215 MPa</span></div>
+          <div class="ir"><span class="ik">Cast iron</span><span class="iv">195–205 MPa</span></div>
+          <div class="ir"><span class="ik">Copper/Brass</span><span class="iv">115–125 MPa</span></div>
+        </div>
+        <div class="ic"><h4>Fastener grades</h4>
+          <div class="ir"><span class="ik">Grade 4.8</span><span class="iv">340 MPa yield</span></div>
+          <div class="ir"><span class="ik">Grade 8.8</span><span class="iv">660 MPa yield</span></div>
+          <div class="ir"><span class="ik">Grade 10.9</span><span class="iv">940 MPa yield</span></div>
+          <div class="ir"><span class="ik">Grade 12.9</span><span class="iv">1100 MPa yield</span></div>
+          <div class="ir"><span class="ik">A2-70 SS</span><span class="iv">450 MPa yield</span></div>
+          <div class="ir"><span class="ik">A4-80 SS</span><span class="iv">600 MPa yield</span></div>
+        </div>
+        <div class="ic"><h4>Friction (μ)</h4>
+          <div class="ir"><span class="ik">Dry steel-steel</span><span class="iv">0.14</span></div>
+          <div class="ir"><span class="ik">Lightly oiled</span><span class="iv">0.12</span></div>
+          <div class="ir"><span class="ik">Greased/zinc</span><span class="iv">0.10</span></div>
+          <div class="ir"><span class="ik">ABS boss (dry)</span><span class="iv">0.16–0.18</span></div>
+          <div class="ir"><span class="ik">Nylon boss</span><span class="iv">0.12–0.15</span></div>
+        </div>
+      </div>
+      <div class="sh" style="margin-top:14px"><h3>Rib design rules</h3><div class="sl"></div></div>
+      <div class="tw"><table><thead><tr><th>Parameter</th><th>Rule</th><th>Why</th></tr></thead><tbody>
+        <tr><td>Rib thickness</td><td>0.5 × wall thickness</td><td>Prevents sink marks</td></tr>
+        <tr><td>Rib height</td><td>Max 3× wall thickness</td><td>Avoids warpage</td></tr>
+        <tr><td>Rib spacing</td><td>2–3× wall thickness</td><td>Even stress distribution</td></tr>
+        <tr><td>Rib base fillet</td><td>Min R0.5mm</td><td>Reduces stress concentration</td></tr>
+        <tr><td>Draft angle</td><td>Min 0.5° per side</td><td>Easy ejection from mould</td></tr>
+        <tr><td>Boss wall thickness</td><td>0.6× nominal wall</td><td>Prevents sink marks</td></tr>
+        <tr><td>Boss fillet at base</td><td>R0.5–R1.0mm</td><td>Reduces stress concentration</td></tr>
+      </tbody></table></div>
+      <div class="sh" style="margin-top:14px"><h3>PEM minimum sheet thickness</h3><div class="sl"></div></div>
+      <div class="tw"><table><thead><tr><th>PEM size</th><th>Min Al (mm)</th><th>Min steel (mm)</th><th>Min plastic (mm)</th><th>Note</th></tr></thead><tbody>
+        <tr><td>M2 / M2.5</td><td>0.5</td><td>0.5</td><td>1.5</td><td>Use PEM B for plastic</td></tr>
+        <tr><td>M3</td><td>0.8</td><td>0.6</td><td>2.0</td><td>Most common in electronics</td></tr>
+        <tr><td>M4</td><td>1.0</td><td>0.8</td><td>2.5</td><td>Standard industrial</td></tr>
+        <tr><td>M5</td><td>1.2</td><td>1.0</td><td>3.0</td><td>Heavy duty</td></tr>
+        <tr><td>M6</td><td>1.5</td><td>1.2</td><td>4.0</td><td>Structural fastening</td></tr>
+        <tr><td>M8+</td><td>2.0</td><td>1.5</td><td>5.0</td><td>Metal sheet strongly recommended</td></tr>
+      </tbody></table></div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span class="ft">Enclosure Engineering Toolkit v2.0 — PEM / Insert / Torque Calculator</span>
+  <span class="ftag">offline / local</span>
+</footer>
+
+<script>
+const SZ={M2:{d:2.0,pc:.40,pf:.25,ac:2.07,af:2.48},'M2.5':{d:2.5,pc:.45,pf:.35,ac:3.39,af:3.99},M3:{d:3.0,pc:.50,pf:.35,ac:5.03,af:6.00},M4:{d:4.0,pc:.70,pf:.50,ac:8.78,af:10.84},M5:{d:5.0,pc:.80,pf:.50,ac:14.20,af:16.10},M6:{d:6.0,pc:1.00,pf:.75,ac:20.12,af:22.00},M8:{d:8.0,pc:1.25,pf:1.00,ac:36.61,af:39.17},M10:{d:10.0,pc:1.50,pf:1.00,ac:58.00,af:64.50},M12:{d:12.0,pc:1.75,pf:1.25,ac:84.27,af:92.07},M16:{d:16.0,pc:2.00,pf:1.50,ac:157.0,af:167.0}};
+const GR={'4.8':{proof:310,yield:340},'8.8':{proof:600,yield:660},'10.9':{proof:830,yield:940},'12.9':{proof:970,yield:1100},A2:{proof:450,yield:450},A4:{proof:600,yield:600}};
+const MT={ABS:{y:40,sf:.30},PC:{y:60,sf:.35},PCABS:{y:50,sf:.32},PA66:{y:80,sf:.40},POM:{y:65,sf:.38},GRP:{y:100,sf:.35},AL:{y:270,sf:.65},SS:{y:210,sf:.70},MS:{y:250,sf:.75},CAST:{y:200,sf:.60},CU:{y:120,sf:.55}};
+const LB={dry:.14,light:.12,greased:.10};
+const HY={ABS:40,PC:60,PCABS:50,PA66:80,POM:65,AL_h:270,MS_h:250,SS_h:210};
+const IY={AL:270,SS:210,MS:250,CU:120};
+const INS={
+  PEM_S: {name:'PEM S-series',te:5,pk:1.8,tlim:.85,blind:false,ms_al:.5,ms_ms:.5,ms_pl:null,note:'Self-clinching for metal sheet. Requires press. NOT for plastic.'},
+  PEM_B: {name:'PEM B-series',te:4,pk:1.2,tlim:.75,blind:false,ms_al:null,ms_ms:null,ms_pl:1.5,note:'Broaching nut for plastic / PCB. Best for ABS, PC, PA66.'},
+  PEM_SP:{name:'PEM SP-series',te:3,pk:1.4,tlim:.70,blind:false,ms_al:.5,ms_ms:.5,ms_pl:null,note:'For thin sheet below 1.5mm. Lower pull-out — use extra fastener points.'},
+  RIVET_AL:{name:'Rivet nut Al',te:4,pk:1.0,tlim:.80,blind:true,ms_al:.8,ms_ms:.8,ms_pl:2.0,note:'Blind install from one side. Use knurled barrel in plastic. Do not over-torque — collapses barrel.'},
+  RIVET_SS:{name:'Rivet nut SS',te:4,pk:1.1,tlim:.80,blind:true,ms_al:.8,ms_ms:.8,ms_pl:2.0,note:'Stainless body for marine, offshore, food-grade. Higher corrosion resistance.'},
+  HELICOIL:{name:'Helicoil',te:6,pk:2.2,tlim:1.0,blind:false,ms_al:null,ms_ms:null,ms_pl:null,note:'SS wire thread insert. For aluminium boss strengthening or thread repair. Full engagement.'},
+  KEENSERT:{name:'Keensert',te:6,pk:2.5,tlim:1.0,blind:false,ms_al:null,ms_ms:null,ms_pl:null,note:'Locking insert with keys. Best for ATEX, defence, high vibration. Permanent.'}
+};
+
+function compute(sk,gk,mk,lk,tt,te){
+  const s=SZ[sk],g=GR[gk],m=MT[mk],mu=LB[lk];
+  const At=tt==='fine'?s.af:s.ac,pitch=tt==='fine'?s.pf:s.pc;
+  const proof=g.proof*At,clamp=proof*.75,K=mu*.9+.04,rec=K*s.d*clamp/1000;
+  const strip=m.y*Math.PI*s.d*pitch*te*m.sf;
+  return{rec:+rec.toFixed(3),min:+(rec*.85).toFixed(3),max:+(rec*1.15).toFixed(3),clamp_kN:+(clamp/1000).toFixed(2),proof_kN:+(proof/1000).toFixed(2),fos:+(strip/clamp).toFixed(2)};
+}
+
+function fi(fos,ft){
+  if(fos>=ft) return{c:'bs',col:'#0a6640',bar:'#1D9E75',lbl:'SAFE',ac:'as',msg:'FOS meets target. Safe to apply recommended torque.'};
+  if(fos>=ft*.8) return{c:'bw',col:'#c47a00',bar:'#f5a623',lbl:'CHECK',ac:'aw',msg:'FOS borderline. Consider metal insert or increasing thread engagement.'};
+  return{c:'bd',col:'#c0392b',bar:'#e24b4a',lbl:'RISK',ac:'ad',msg:'Thread strip risk. Use helicoil, increase boss wall, or choose larger fastener.'};
+}
+
+function compIns(sk){
+  const it=document.getElementById('insert_type').value;
+  const ins=INS[it];
+  const gk=document.getElementById('grade').value;
+  const lk=document.getElementById('lube').value;
+  const tt=document.getElementById('thread').value;
+  const sht=parseFloat(document.getElementById('sheet_t').value)||2;
+  const hm=document.getElementById('housing_mat').value;
+  const im=document.getElementById('insert_mat').value;
+  const ft=parseFloat(document.getElementById('fos_target').value);
+  const s=SZ[sk],g=GR[gk],mu=LB[lk];
+  const At=tt==='fine'?s.af:s.ac,pitch=tt==='fine'?s.pf:s.pc;
+  const proof=g.proof*At,clamp=proof*.75;
+  const K=mu*.9+.04,trec=(K*s.d*clamp/1000)*ins.tlim;
+  const iY=IY[im],strip=iY*Math.PI*s.d*pitch*ins.te*.65;
+  const hY=HY[hm]||250,pullout=ins.pk*hY*Math.PI*s.d*sht;
+  const fos_s=+(strip/clamp).toFixed(2),fos_p=+(pullout/clamp).toFixed(2);
+  const isPlastic=!hm.includes('_h');
+  const minSheet=isPlastic?(ins.ms_pl):(ins.ms_al||ins.ms_ms);
+  return{trec:+trec.toFixed(2),tmin:+(trec*.85).toFixed(2),tmax:+(trec*1.10).toFixed(2),clamp_kN:+(clamp/1000).toFixed(2),pullout_kN:+(pullout/1000).toFixed(2),fos_s,fos_p,minSheet,ins,ft,sht,hm,im,isPlastic};
+}
+
+function calc(){
+  const sk=document.getElementById('size').value,gk=document.getElementById('grade').value;
+  const mk=document.getElementById('material').value,lk=document.getElementById('lube').value;
+  const tt=document.getElementById('thread').value,te=parseInt(document.getElementById('threads').value)||6;
+  const ft=parseFloat(document.getElementById('fos_target').value);
+  const r=compute(sk,gk,mk,lk,tt,te),f=fi(r.fos,ft);
+  document.getElementById('size-label').textContent=sk+' / '+gk+' / '+document.getElementById('material').options[document.getElementById('material').selectedIndex].text.split('(')[0].trim();
+  document.getElementById('r-rec').textContent=r.rec.toFixed(2);
+  document.getElementById('r-min').textContent=r.min.toFixed(2);
+  document.getElementById('r-max').textContent=r.max.toFixed(2);
+  document.getElementById('r-clamp').textContent=r.clamp_kN.toFixed(2);
+  document.getElementById('r-proof').textContent=r.proof_kN.toFixed(2);
+  document.getElementById('r-fos').textContent='FOS '+r.fos.toFixed(2);
+  document.getElementById('r-fos').style.color=f.col;
+  document.getElementById('fos-tlbl').textContent='Target: '+ft.toFixed(1);
+  const pct=Math.min(100,(r.fos/(ft*1.5))*100);
+  document.getElementById('fos-bar').style.cssText='width:'+pct.toFixed(0)+'%;background:'+f.bar;
+  document.getElementById('fos-badge').innerHTML='<span class="sb2 '+f.c+'">'+f.lbl+'</span>';
+  document.getElementById('alert-box').innerHTML='<div class="al '+f.ac+'">'+f.msg+'</div>';
+  buildRefTable(sk,gk,mk,lk,tt,te,ft);
+  buildFosGrid(gk,mk,lk,tt,te,ft);
+  calcInsert();
+}
+
+function buildRefTable(selSk,gk,mk,lk,tt,te,ft){
+  const tb=document.getElementById('ref-body');tb.innerHTML='';
+  Object.keys(SZ).forEach(sk=>{
+    const r=compute(sk,gk,mk,lk,tt,te),f=fi(r.fos,ft);
+    const tr=document.createElement('tr');
+    if(sk===selSk)tr.className='sel';
+    tr.innerHTML='<td>'+sk+'</td><td>'+r.min.toFixed(2)+'</td><td>'+r.rec.toFixed(2)+'</td><td>'+r.max.toFixed(2)+'</td><td>'+r.clamp_kN.toFixed(2)+'</td><td style="color:'+f.col+'">'+r.fos.toFixed(2)+'</td><td><span style="font-size:10px;padding:2px 7px;border-radius:3px;background:'+f.bar+'22;color:'+f.col+';border:1px solid '+f.bar+'44;font-family:var(--mono)">'+f.lbl+'</span></td>';
+    tb.appendChild(tr);
+  });
+}
+
+function buildFosGrid(gk,mk,lk,tt,te,ft){
+  const g=document.getElementById('fos-grid');if(!g)return;g.innerHTML='';
+  Object.keys(SZ).forEach(sk=>{
+    const r=compute(sk,gk,mk,lk,tt,te),f=fi(r.fos,ft);
+    const el=document.createElement('div');el.className='cc';el.style.borderColor=f.col+'55';
+    el.innerHTML='<div class="ccs" style="color:'+f.col+'">'+sk+'</div><div class="cct">'+r.rec.toFixed(2)+' N·m</div><div style="font-size:10px;color:'+f.col+';font-family:var(--mono);margin-top:2px">FOS '+r.fos.toFixed(2)+'</div>';
+    g.appendChild(el);
+  });
+}
+
+function selectInsert(type){
+  document.getElementById('insert_type').value=type;
+  syncInsertCard();calcInsert();
+}
+
+function syncInsertCard(){
+  const it=document.getElementById('insert_type').value;
+  document.querySelectorAll('.itc').forEach(c=>c.classList.remove('active'));
+  const cd=document.getElementById('icard-'+it);if(cd)cd.classList.add('active');
+}
+
+function calcInsert(){
+  const sk=document.getElementById('size').value;
+  const r=compIns(sk);
+  const ins=r.ins,ft=r.ft;
+  const isPlastic=r.isPlastic;
+  const minSheet=r.minSheet;
+  const sheetOk=minSheet===null||r.sht>=minSheet;
+  const pemNotForPlastic=isPlastic&&(ins.ms_pl===null);
+
+  let banner='';
+  if(pemNotForPlastic){
+    banner='<div class="wbanner">⚠ '+ins.name+' is NOT suitable for plastic housing. Use PEM B-series or Rivet nut (knurled barrel) for plastic enclosures.</div>';
+  } else if(!sheetOk){
+    banner='<div class="wbanner">⚠ Sheet thickness '+r.sht+'mm is below minimum '+minSheet+'mm for '+ins.name+'. Increase thickness or choose different insert. Risk of pull-out or deformation.</div>';
+  } else {
+    banner='<div class="obanner">✓ '+ins.name+' — suitable for selected material and thickness.<br>'+ins.note+'</div>';
+  }
+  document.getElementById('insert-banner').innerHTML=banner;
+
+  document.getElementById('ins-metrics1').innerHTML=
+    '<div class="mc"><div class="ml">Min torque</div><div class="mv">'+r.tmin.toFixed(2)+'</div><div class="mu">N·m</div></div>'+
+    '<div class="mc feat"><div class="ml">Recommended torque</div><div class="mv">'+r.trec.toFixed(2)+'</div><div class="mu">N·m</div></div>'+
+    '<div class="mc"><div class="ml">Max torque</div><div class="mv">'+r.tmax.toFixed(2)+'</div><div class="mu">N·m</div></div>';
+  document.getElementById('ins-metrics2').innerHTML=
+    '<div class="mc"><div class="ml">Pull-out force</div><div class="mv">'+r.pullout_kN.toFixed(2)+'</div><div class="mu">kN</div></div>'+
+    '<div class="mc"><div class="ml">Clamping force</div><div class="mv">'+r.clamp_kN.toFixed(2)+'</div><div class="mu">kN</div></div>';
+
+  const fmin=Math.min(r.fos_s,r.fos_p),f=fi(fmin,ft);
+  const pct=Math.min(100,(fmin/(ft*1.5))*100);
+  document.getElementById('ins-fos-val').textContent='Strip FOS '+r.fos_s.toFixed(2)+'  /  Pull-out FOS '+r.fos_p.toFixed(2);
+  document.getElementById('ins-fos-val').style.color=f.col;
+  document.getElementById('ins-fos-bar').style.cssText='width:'+pct.toFixed(0)+'%;background:'+f.bar;
+  document.getElementById('ins-badges').innerHTML='<span class="sb2 '+f.c+'">'+f.lbl+'</span><span style="font-family:var(--mono);font-size:10px;color:var(--text3)">Target FOS: '+ft.toFixed(1)+'</span>';
+  document.getElementById('ins-alert').innerHTML='<div class="al '+f.ac+'">'+f.msg+'</div>';
+
+  const hname=document.getElementById('housing_mat').options[document.getElementById('housing_mat').selectedIndex].text;
+  const gname=document.getElementById('grade').options[document.getElementById('grade').selectedIndex].text.split('—')[0].trim();
+  document.getElementById('dcallout').innerHTML=
+    '<strong>// ASSEMBLY DRAWING CALLOUT — '+sk+' '+ins.name.toUpperCase()+' //</strong><br><br>'+
+    'Insert: '+ins.name+' — '+document.getElementById('insert_mat').options[document.getElementById('insert_mat').selectedIndex].text+' body<br>'+
+    'Thread: '+sk+' coarse pitch  |  Grade: '+gname+'<br>'+
+    'Housing: '+hname+'  |  Sheet/wall thickness: '+r.sht+'mm<br><br>'+
+    '<strong>Torque specification:</strong><br>'+
+    'Min: '+r.tmin.toFixed(2)+' N·m  |  Rec: '+r.trec.toFixed(2)+' N·m  |  Max: '+r.tmax.toFixed(2)+' N·m<br>'+
+    'DO NOT exceed '+r.tmax.toFixed(2)+' N·m — risk of insert damage or sheet deformation.<br><br>'+
+    '<strong>Installation:</strong><br>'+
+    (ins.blind?'Blind installation (rivet nut tool required). Install before final assembly. ':'Press or tooling installation required. ')+
+    'Verify flush seating after installation.<br>'+
+    'Min thread engagement: '+ins.te+' threads<br>'+
+    'Pull-out capacity: '+r.pullout_kN.toFixed(2)+' kN (FOS '+r.fos_p.toFixed(2)+' at working load)';
+
+  buildInsTable(sk,ft);
+}
+
+function buildInsTable(selSk,ft){
+  const tb=document.getElementById('ins-tbody');tb.innerHTML='';
+  Object.keys(SZ).forEach(sk=>{
+    const r=compIns(sk),fmin=Math.min(r.fos_s,r.fos_p),f=fi(fmin,ft);
+    const isPlastic=r.isPlastic,ins=r.ins;
+    const minSheet=r.minSheet;
+    const sheetOk=minSheet===null||r.sht>=minSheet;
+    const pemBad=isPlastic&&ins.ms_pl===null;
+    let suit=f.lbl,suitCol=f.col;
+    if(pemBad){suit='N/A';suitCol='#c0392b';}
+    else if(!sheetOk){suit='THIN';suitCol='#c0392b';}
+    const tr=document.createElement('tr');
+    if(sk===selSk)tr.className='sel';
+    tr.innerHTML='<td>'+sk+'</td><td>'+r.trec.toFixed(2)+'</td><td>'+r.pullout_kN.toFixed(2)+'</td><td style="color:'+f.col+'">'+r.fos_s.toFixed(2)+'</td><td style="color:'+f.col+'">'+r.fos_p.toFixed(2)+'</td><td>'+(minSheet||'—')+'</td><td><span style="font-size:10px;padding:2px 7px;border-radius:3px;background:'+suitCol+'22;color:'+suitCol+';border:1px solid '+suitCol+'44;font-family:var(--mono)">'+suit+'</span></td>';
+    tb.appendChild(tr);
+  });
+}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  el.classList.add('active');
+}
+
+calc();
+</script>
+</body>
+</html>
